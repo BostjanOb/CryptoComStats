@@ -1,0 +1,15 @@
+Timestamp (UTC),Transaction Description,Currency,Amount,To Currency,To Amount,Native Currency,Native Amount,Native Amount (in USD),Transaction Kind
+2021-12-24 08:24:54,EUR -> USDC,EUR,-20.36,USDC,23.0,EUR,20.36,23.1221762516,viban_purchase
+2021-12-24 06:14:51,Card Cashback,CRO,0.64307751,,,EUR,0.35,0.3974833835,referral_card_cashback
+2021-12-24 01:03:33,Crypto Earn,USDC,6.48364932,,,EUR,5.71,6.4846574851,crypto_earn_interest_paid
+2021-12-24 01:03:32,Crypto Earn,ETH,0.00249315,,,EUR,8.94,10.1528612814,crypto_earn_interest_paid
+2021-12-23 08:01:51,EUR -> USDC,EUR,-20.41,USDC,23.0,EUR,20.41,23.1789595921,viban_purchase
+2021-12-23 00:52:33,CRO Stake Rewards,CRO,9.51232877,,,EUR,4.4,4.996933964,mco_stake_reward
+2021-12-22 11:20:37,EUR -> USDC,EUR,-20.41,USDC,23.0,EUR,20.41,23.1789595921,viban_purchase
+2021-12-21 13:18:02,Card Cashback,CRO,4.26670911,,,EUR,1.97,2.2372636157,referral_card_cashback
+2021-12-20 20:50:58,Mission Rewards Deposit,CRO,8.6,,,EUR,3.73,4.2360372013,rewards_platform_deposit_credited
+2021-12-20 15:38:21,Card Cashback,CRO,0.38910332,,,EUR,0.17,0.1930633577,referral_card_cashback
+2021-12-20 15:00:24,Card Cashback,CRO,6.16818308,,,EUR,2.69,3.0549437189,referral_card_cashback
+2021-12-20 13:39:21,Card Cashback,CRO,1.79727754,,,EUR,0.78,0.8858201118,referral_card_cashback
+2021-12-20 13:17:28,Card Cashback,CRO,4.45757739,,,EUR,1.95,2.2145502795,referral_card_cashback
+2021-12-20 12:43:16,Card Cashback,CRO,1.36723059,,,EUR,0.6,0.681400086,referral_card_cashback
