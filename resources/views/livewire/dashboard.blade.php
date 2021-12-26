@@ -71,13 +71,13 @@
                                             Cashback
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <x-price :price="$cashback['amount']" currency="CRO"/>
+                                            <x-price :price="$cashback['amount'] ?? 0" currency="CRO"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <x-price :price="$cashback['native']" currency="EUR" :decimals="3"/>
+                                            <x-price :price="$cashback['native'] ?? 0" currency="EUR" :decimals="3"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <x-price :price="$cashback['currentNative']" currency="EUR" :decimals="3"/>
+                                            <x-price :price="$cashback['currentNative'] ?? 0" currency="EUR" :decimals="3"/>
                                         </td>
                                     </tr>
 
@@ -86,13 +86,13 @@
                                             CRO Stake rewards
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <x-price :price="$croStake['amount']" currency="CRO"/>
+                                            <x-price :price="$croStake['amount'] ?? 0" currency="CRO"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <x-price :price="$croStake['native']" currency="EUR" :decimals="3"/>
+                                            <x-price :price="$croStake['native'] ?? 0" currency="EUR" :decimals="3"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <x-price :price="$croStake['currentNative']" currency="EUR" :decimals="3"/>
+                                            <x-price :price="$croStake['currentNative'] ?? 0" currency="EUR" :decimals="3"/>
                                         </td>
                                     </tr>
 
@@ -132,11 +132,11 @@
                                         <th scope="col" class="px-6 py-3 text-left font-bols text-gray-900 uppercase tracking-wider">
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left font-bols text-gray-900 uppercase tracking-wider">
-                                            <x-price :price="$cashback['native'] + $croStake['native'] + $earn->sum('native')"
+                                            <x-price :price="($cashback['native'] ?? 0) + ($croStake['native'] ?? 0) + $earn->sum('native')"
                                                      currency="EUR" :decimals="3"/>
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left font-bols text-gray-900 uppercase tracking-wider">
-                                            <x-price :price="$cashback['currentNative'] + $croStake['currentNative'] + $earn->sum('currentNative')"
+                                            <x-price :price="($cashback['currentNative'] ?? 0) + ($croStake['currentNative'] ?? 0) + $earn->sum('currentNative')"
                                                      currency="EUR" :decimals="3"/>
                                         </th>
                                     </tr>
