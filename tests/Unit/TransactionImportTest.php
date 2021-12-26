@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Faker\faker;
 
-uses(RefreshDatabase::class, Tests\TestCase::class);
+uses(RefreshDatabase::class);
 
 it('inserts data', function () {
     $user = User::factory()->create();
