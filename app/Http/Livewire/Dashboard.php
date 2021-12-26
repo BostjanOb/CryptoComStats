@@ -31,15 +31,22 @@ class Dashboard extends Component
 
         $earn = [];
         if ($transactions->has('crypto_earn_interest_paid')) {
-            $earn = $transactions['crypto_earn_interest_paid']->groupBy('currency')->map(function ($transactions, $coin) {
-                return [
-                    'title'         => $coin,
-                    'symbol'        => $coin,
-                    'amount'        => $transactions->sum('amount'),
-                    'native'        => $transactions->sum('native_amount'),
-                    'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
-                ];
-            });
+            $earn = $transactions['crypto_earn_interest_paid']
+                ->groupBy('currency')
+                ->map(function ($transactions, $coin) use (&$sum) {
+                    $row = [
+                        'title'         => $coin,
+                        'symbol'        => $coin,
+                        'amount'        => $transactions->sum('amount'),
+                        'native'        => $transactions->sum('native_amount'),
+                        'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
+                    ];
+
+                    $sum['native'] += $row['native'];
+                    $sum['currentNative'] += $row['currentNative'];
+
+                    return $row;
+                });
         }
         if ($transactions->has('crypto_earn_extra_interest_paid')) {
             $earn[] = [
@@ -49,6 +56,9 @@ class Dashboard extends Component
                 'native'        => $transactions['crypto_earn_extra_interest_paid']->sum('native_amount'),
                 'currentNative' => $transactions['crypto_earn_extra_interest_paid']->sum('amount') * Coingecko::price('cro'),
             ];
+
+            $sum['native'] += $transactions['crypto_earn_extra_interest_paid']->sum('native_amount');
+            $sum['currentNative'] += ($transactions['crypto_earn_extra_interest_paid']->sum('amount') * Coingecko::price('cro'));
         }
 
         return view('livewire.dashboard')
