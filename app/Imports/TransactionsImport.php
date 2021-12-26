@@ -25,6 +25,7 @@ class TransactionsImport implements ToCollection, WithHeadingRow
     {
         Transaction::where('created_at', '>=', Carbon::parse($collection->min('timestamp_utc')))
             ->where('created_at', '<=', Carbon::parse($collection->max('timestamp_utc')))
+            ->where('user_id', $this->user->id)
             ->delete();
 
         $collection->each(function ($row) {
