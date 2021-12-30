@@ -3,14 +3,41 @@
 namespace App\Http\Livewire;
 
 use App\Coingecko;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Dashboard extends Component
 {
+    public string $from = '';
+    public string $to = '';
+
+    public function mount()
+    {
+        $this->from = today()->startOfMonth()->format('Y-m-d');
+        $this->to = today()->endOfMonth()->format('Y-m-d');
+    }
+
+    public function prevMonth()
+    {
+        $this->from = Carbon::parse($this->from)->subMonth()->startOfMonth()->format('Y-m-d');
+        $this->to = Carbon::parse($this->to)->startOfMonth()->subMonth()->endOfMonth()->format('Y-m-d');
+    }
+
+    public function nextMonth()
+    {
+        $this->from = Carbon::parse($this->from)->addMonth()->startOfMonth()->format('Y-m-d');
+        $this->to = Carbon::parse($this->to)->startOfMonth()->addMonth()->endOfMonth()->format('Y-m-d');
+    }
+
     public function render()
     {
-        $transactions = Auth::user()->transactions->groupBy('kind');
+        $transactions = Auth::user()
+            ->transactions()
+            ->when($this->from, fn($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
+            ->when($this->to, fn($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
+            ->get()
+            ->groupBy('kind');
 
         $rows = [
             'referral_card_cashback' => ['title' => 'Cashback',],
