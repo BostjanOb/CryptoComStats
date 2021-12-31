@@ -80,6 +80,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach($rows as $row)
+                                            @continue($row['amount'] === 0)
                                             <tr class="bg-white">
                                                 <td class="font-bold px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {{ $row['title'] }}
@@ -96,45 +97,61 @@
                                             </tr>
                                         @endforeach
 
-                                        <tr class="bg-gray-50">
-                                            <td class="font-bold px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                                                Earn
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            </td>
-                                        </tr>
-                                        @foreach($earn as $coin)
+                                        @if(count($earn))
                                             <tr class="bg-gray-50">
-                                                <td class="font-semibold px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {{ $coin['title'] }}
+                                                <td class="font-bold px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                                                    Earn
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <x-price :price="$coin['amount']" :currency="$coin['symbol']"/>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <x-price :price="$coin['native']" currency="EUR" :decimals="3"/>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <x-price :price="$coin['currentNative']" currency="EUR" :decimals="3"/>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                            @foreach($earn as $coin)
+                                                <tr class="bg-gray-50">
+                                                    <td class="font-semibold px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        {{ $coin['title'] }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <x-price :price="$coin['amount']" :currency="$coin['symbol']"/>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <x-price :price="$coin['native']" currency="EUR" :decimals="3"/>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <x-price :price="$coin['currentNative']" currency="EUR" :decimals="3"/>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                                <tr class="bg-gray-100">
+                                                    <td class="font-semibold px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        Total earn
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    </td>
+                                                    <td class="px-6 py-4 font-semibold whitespace-nowrap text-sm text-gray-500">
+                                                        <x-price :price="$earn->sum('native')" currency="EUR" :decimals="3"/>
+                                                    </td>
+                                                    <td class="px-6 py-4 font-semibold whitespace-nowrap text-sm text-gray-500">
+                                                        <x-price :price="$earn->sum('currentNative')" currency="EUR" :decimals="3"/>
+                                                    </td>
+                                                </tr>
+                                        @endif
                                     </tbody>
 
                                     <tfoot class="bg-blue-50">
                                         <tr>
-                                            <th scope="col" class="px-6 py-3 text-left font-bold text-gray-900 uppercase tracking-wider">
+                                            <th scope="col" class="px-6 py-4 text-left font-bold text-gray-900 uppercase tracking-wider">
+                                                Total earnings
                                             </th>
-                                            <th scope="col" class="px-6 py-3 text-left font-bold text-gray-900 uppercase tracking-wider">
+                                            <th scope="col" class="px-6 py-4 text-left font-bold text-gray-900 uppercase tracking-wider">
                                             </th>
-                                            <th scope="col" class="px-6 py-3 text-left font-bold text-gray-900 uppercase tracking-wider">
+                                            <th scope="col" class="px-6 py-4 text-left font-bold text-gray-900 uppercase tracking-wider">
                                                 <x-price :price="$sum['native']" currency="EUR" :decimals="3"/>
                                             </th>
-                                            <th scope="col" class="px-6 py-3 text-left font-bold text-gray-900 uppercase tracking-wider">
+                                            <th scope="col" class="px-6 py-4 text-left font-bold text-gray-900 uppercase tracking-wider">
                                                 <x-price :price="$sum['currentNative']"
                                                          currency="EUR" :decimals="3"/>
                                             </th>
