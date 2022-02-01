@@ -18,9 +18,7 @@ class Coingecko
             "coingecko_price_{$coin}_{$fiat}",
             now()->addMinutes(10),
             function () use ($coin, $fiat) {
-                $coinId = ($coin === 'cro') 
-                        ? 'crypto-com-chain' 
-                        : Arr::get(self::coinsList()->get($coin, []), 'id', null);
+                $coinId = Arr::get(self::coinsList()->get($coin, []), 'id', null);
                 if ($coinId === null) {
                     throw new \InvalidArgumentException("Coin $coin not found");
                 }
@@ -42,6 +40,7 @@ class Coingecko
             now()->addMinutes(60),
             fn() => Http::get('https://api.coingecko.com/api/v3/coins/list')
                 ->collect()
+                ->reject(fn($coin) => Str::endsWith($coin['id'], '-wormhole'))
                 ->keyBy('symbol')
         );
     }
