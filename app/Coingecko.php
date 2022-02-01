@@ -18,7 +18,9 @@ class Coingecko
             "coingecko_price_{$coin}_{$fiat}",
             now()->addMinutes(10),
             function () use ($coin, $fiat) {
-                $coinId = Arr::get(self::coinsList()->get($coin, []), 'id', null);
+                $coinId = ($coin === 'cro') 
+                        ? 'crypto-com-chain' 
+                        : Arr::get(self::coinsList()->get($coin, []), 'id', null);
                 if ($coinId === null) {
                     throw new \InvalidArgumentException("Coin $coin not found");
                 }
