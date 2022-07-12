@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 it('inserts data', function () {
     $user = User::factory()->create();
 
-    (new \App\Imports\TransactionsImport($user))
+    (new \App\Imports\CdcTransactionsImport($user))
         ->import(base_path('tests/Fixtures/transactions.csv'));
 
     expect(\App\Models\Transaction::count())->toEqual(14);
@@ -32,7 +32,7 @@ it('removes old data before insert', function () {
         'created_at'      => Carbon::parse('2021-12-20 15:00:24'),
     ]);
 
-    (new \App\Imports\TransactionsImport($user))
+    (new \App\Imports\CdcTransactionsImport($user))
         ->import(base_path('tests/Fixtures/transactions.csv'));
 
     expect(\App\Models\Transaction::count())->toEqual(14);

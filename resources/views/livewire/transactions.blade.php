@@ -18,6 +18,9 @@
                                             Timestamp
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Platform
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Description
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -30,6 +33,9 @@
                                         <tr class="{{ $loop->odd ? 'bg-white' : 'bg-gray-50' }}">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {{ $transaction->created_at->timezone('Europe/Ljubljana')->format('d.m.Y H:i:s') }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {{ \App\Platform::PLATFORMS[$transaction->platform] }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                 {{ $transaction->description }}

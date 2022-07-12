@@ -12,12 +12,27 @@
             </div>
 
             <form class="mt-6 text-gray-500">
-                <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="file" name="file" wire:model="file" class="block w-full">
+
+                <div>
+                    <label for="platform" class="block text-sm font-medium text-gray-700">Platform</label>
+                    <select id="platform" name="platform"
+                            wire:model.defer="platform"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="cdc">Crypto.com</option>
+                        <option value="nexo">Nexo</option>
+                    </select>
                 </div>
-                @error('file')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+
+
+                <div class="mt-4">
+                    <label for="file" class="block text-sm font-medium text-gray-700">File</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input id="fle" type="file" name="file" wire:model="file" class="block w-full">
+                    </div>
+                    @error('file')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 @if($readyToImport > 0)
                     <div class="rounded-md bg-blue-50 p-4 mt-4">
@@ -43,7 +58,7 @@
                         wire:loading.class="pointer-events-none animate-pulse"
                         {{ $readyToImport !== 0 ? '' : 'disabled' }}
                         class="{{ $readyToImport !== 0 ? '': 'opacity-50 pointer-events-none' }} inline-flex mt-4 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Import uploaded file
+                    Import file
                 </button>
             </form>
         </div>
