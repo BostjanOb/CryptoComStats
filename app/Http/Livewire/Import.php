@@ -6,6 +6,7 @@ use App\Imports\CdcTransactionsImport;
 use App\Imports\NexoTransactionsImport;
 use App\Platform;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Excel;
@@ -17,6 +18,7 @@ class Import extends Component
     public int $readyToImport = 0;
     public string $platform = 'cdc';
     public $file;
+    public bool $imported = false;
 
     public function updatedFile()
     {
@@ -72,18 +74,21 @@ class Import extends Component
 
     public function import()
     {
-        switch ($this->platform) {
-            case Platform::CDC:
-                (new CdcTransactionsImport(Auth::user()))->import($this->file->path(), null, Excel::CSV);
-                break;
-            case Platform::NEXO;
-                (new NexoTransactionsImport(Auth::user()))->import($this->file->path(), null, Excel::CSV);
-                break;
-        }
+        DB::transaction(function () {
+            switch ($this->platform) {
+                case Platform::CDC:
+                    (new CdcTransactionsImport(Auth::user()))->import($this->file->path(), null, Excel::CSV);
+                    break;
+                case Platform::NEXO;
+                    (new NexoTransactionsImport(Auth::user()))->import($this->file->path(), null, Excel::CSV);
+                    break;
+            }
 
-        $this->file->delete();
-        $this->file = null;
-        $this->readyToImport = 0;
+            $this->file->delete();
+            $this->file = null;
+            $this->readyToImport = 0;
+            $this->imported = true;
+        });
     }
 
     public function render()

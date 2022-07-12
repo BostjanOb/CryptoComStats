@@ -97,9 +97,9 @@
                                             </tr>
                                         @endforeach
 
-                                        @if(count($earnCdc))
+                                        @if(count($earnCdc) || count($earnNexo))
                                             <tr class="bg-gray-200">
-                                                <td class="font-bold px-6 py-4 whitespace-nowrap uppercase font-medium text-gray-900">
+                                                <td class="font-bold px-6 py-4 whitespace-nowrap uppercase text-gray-900">
                                                     Earn
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -111,7 +111,7 @@
                                             </tr>
                                             @if(count($earnCdc))
                                                 <tr class="bg-white">
-                                                    <td class="font-bold px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                                                    <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
                                                         Crypto.com
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -123,7 +123,7 @@
                                                 </tr>
                                                 @foreach($earnCdc as $coin)
                                                     <tr class="bg-white">
-                                                        <td class="font-semibold px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        <td class="px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
                                                             {{ $coin['title'] }}
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -137,12 +137,24 @@
                                                         </td>
                                                     </tr>
                                                 @endforeach
+                                                <tr class="bg-white">
+                                                    <td class="px-6 py-4 pl-12 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                                        Total Crypto.com earn
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                                        <x-price :price="$earnCdc->sum('currentNative')" currency="EUR" :decimals="3"/>
+                                                    </td>
+                                                </tr>
                                             @endif
 
 
                                             @if(count($earnNexo))
                                                 <tr class="bg-gray-50">
-                                                    <td class="font-bold px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                                                    <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
                                                         Nexo
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -154,7 +166,7 @@
                                                 </tr>
                                                 @foreach($earnNexo as $coin)
                                                     <tr class="bg-gray-50">
-                                                        <td class="font-semibold px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        <td class="px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
                                                             {{ $coin['title'] }}
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -167,18 +179,30 @@
                                                         </td>
                                                     </tr>
                                                 @endforeach
+                                                <tr class="bg-white">
+                                                    <td class="px-6 py-4 pl-12 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                                        Total Nexo earn
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                                        <x-price :price="$earnNexo->sum('currentNative')" currency="EUR" :decimals="3"/>
+                                                    </td>
+                                                </tr>
                                             @endif
 
 
                                             <tr class="bg-gray-100">
-                                                <td class="font-semibold px-6 py-4 pl-12 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <td class="font-bold uppercase px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                     Total earn
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 </td>
                                                 <td class="px-6 py-4 font-semibold whitespace-nowrap text-sm text-gray-500">
                                                 </td>
-                                                <td class="px-6 py-4 font-semibold whitespace-nowrap text-sm text-gray-500">
+                                                <td class="px-6 py-4 font-semibold whitespace-nowrap text-sm text-gray-900">
                                                     <x-price :price="$earnCdc->sum('currentNative') + $earnNexo->sum('currentNative')" currency="EUR" :decimals="3"/>
                                                 </td>
                                             </tr>

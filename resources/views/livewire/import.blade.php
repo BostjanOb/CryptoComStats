@@ -53,13 +53,21 @@
                     </div>
                 @endif
 
-                <button type="button"
-                        wire:click="import"
-                        wire:loading.class="pointer-events-none animate-pulse"
-                        {{ $readyToImport !== 0 ? '' : 'disabled' }}
-                        class="{{ $readyToImport !== 0 ? '': 'opacity-50 pointer-events-none' }} inline-flex mt-4 items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Import file
-                </button>
+                <div class="flex items-center mt-4">
+                    <button type="button"
+                            wire:click="import"
+                            wire:loading.class="pointer-events-none animate-pulse"
+                            {{ $readyToImport !== 0 ? '' : 'disabled' }}
+                            class="{{ $readyToImport !== 0 ? '': 'opacity-50 pointer-events-none' }} items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Import file
+                    </button>
+
+                    @if($imported)
+                    <div class="ml-4">
+                        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800"> Imported! </span>
+                    </div>
+                    @endif
+                </div>
             </form>
         </div>
     </div>
