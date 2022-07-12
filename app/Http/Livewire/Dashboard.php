@@ -60,7 +60,7 @@ class Dashboard extends Component
             $sum['currentNative'] += $row['currentNative'];
         }
 
-        $earnCdc = [];
+        $earnCdc = collect([]);
         if ($transactions->has('crypto_earn_interest_paid')) {
             $earnCdc = $transactions['crypto_earn_interest_paid']
                 ->groupBy('currency')
@@ -100,7 +100,7 @@ class Dashboard extends Component
             ->when($this->to, fn($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
             ->get();
 
-        $earnNexo = [];
+        $earnNexo = collect([]);
         if ($nexoTransactions->count()) {
             $earnNexo = $nexoTransactions
                 ->groupBy('currency')
