@@ -31,7 +31,7 @@
             </div>
         </div>
         <div>
-            @if( $transactions->count() === 0 )
+            @if( $transactions->count() === 0 && $nexoTransactions->count() === 0 )
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
                         <div class="text-center">

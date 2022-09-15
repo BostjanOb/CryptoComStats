@@ -122,6 +122,7 @@ class Dashboard extends Component
 
         return view('livewire.dashboard')
             ->with('transactions', $transactions)
+            ->with('nexoTransactions', $nexoTransactions)
             ->with('rows', $rows)
             ->with('sum', $sum)
             ->with('earnCdc', $earnCdc)
