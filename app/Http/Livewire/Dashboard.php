@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Coingecko;
 use App\Platform;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -35,7 +36,7 @@ class Dashboard extends Component
 
     public function render()
     {
-        $transactions = Auth::user()
+        $cdcTransactions = Auth::user()
             ->transactions()
             ->where('platform', Platform::CDC)
             ->when($this->from, fn($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
@@ -43,89 +44,79 @@ class Dashboard extends Component
             ->get()
             ->groupBy('kind');
 
-        $rows = [
-            'referral_card_cashback' => ['title' => 'Cashback',],
-            'mco_stake_reward'       => ['title' => 'CRO Stake rewards',],
-            'reimbursement'          => ['title' => 'Reimbursement (Netflix / Spotify)',],
-        ];
-
-        $sum = ['native' => 0, 'currentNative' => 0];
+        $rows = collect([
+            'referral_card_cashback' => ['title' => 'Crpyo.com Cashback', 'amount' => 0, 'currency' => 'CRO'],
+            'mco_stake_reward'       => ['title' => 'Crypto.com CRO Stake rewards', 'amount' => 0, 'currency' => 'CRO'],
+            'reimbursement'          => ['title' => 'Crypto.com Reimbursement (Netflix / Spotify)', 'amount' => 0, 'currency' => 'CRO'],
+        ]);
 
         foreach ($rows as $key => &$row) {
-            $row['amount'] = $transactions->has($key) ? $transactions[$key]->sum('amount') : 0;
-            $row['native'] = $transactions->has($key) ? $transactions[$key]->sum('native_amount') : 0;
-            $row['currentNative'] = $transactions->has($key) ? $transactions[$key]->sum('amount') * Coingecko::price('cro') : 0;
-
-            $sum['native'] += $row['native'];
-            $sum['currentNative'] += $row['currentNative'];
+            $row['amount'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('amount') : 0;
+            $row['native'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('native_amount') : 0;
+            $row['currentNative'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('amount') * Coingecko::price('cro') : 0;
         }
 
-        $earnCdc = collect([]);
-        if ($transactions->has('crypto_earn_interest_paid')) {
-            $earnCdc = $transactions['crypto_earn_interest_paid']
-                ->groupBy('currency')
-                ->map(function ($transactions, $coin) use (&$sum) {
-                    $row = [
-                        'title'         => $coin,
-                        'symbol'        => $coin,
-                        'amount'        => $transactions->sum('amount'),
-                        'native'        => $transactions->sum('native_amount'),
-                        'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
-                    ];
-
-                    $sum['native'] += $row['native'];
-                    $sum['currentNative'] += $row['currentNative'];
-
-                    return $row;
-                });
-        }
-        if ($transactions->has('crypto_earn_extra_interest_paid')) {
-            $earnCdc[] = [
-                'title'         => 'Earn Extra Interest',
-                'symbol'        => 'CRO',
-                'amount'        => $transactions['crypto_earn_extra_interest_paid']->sum('amount'),
-                'native'        => $transactions['crypto_earn_extra_interest_paid']->sum('native_amount'),
-                'currentNative' => $transactions['crypto_earn_extra_interest_paid']->sum('amount') * Coingecko::price('cro'),
-            ];
-
-            $sum['native'] += $transactions['crypto_earn_extra_interest_paid']->sum('native_amount');
-            $sum['currentNative'] += ($transactions['crypto_earn_extra_interest_paid']->sum('amount') * Coingecko::price('cro'));
-        }
-
-        $nexoTransactions = Auth::user()
+        $binanceCashback = Auth::user()
             ->transactions()
-            ->where('platform', Platform::NEXO)
-            ->where('kind', 'Interest')
+            ->where('platform', Platform::BINANCE_CARD)
             ->when($this->from, fn($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
             ->when($this->to, fn($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
-            ->get();
+            ->sum('amount');
+        $rows['binance_cashback'] = [
+            'title'         => 'Binance Cashback',
+            'amount'        => $binanceCashback,
+            'currency'      => 'BNB',
+            'currentNative' => $binanceCashback * Coingecko::price('bnb'),
+        ];
 
-        $earnNexo = collect([]);
-        if ($nexoTransactions->count()) {
-            $earnNexo = $nexoTransactions
+        $earn = collect([]);
+        if ($cdcTransactions->has('crypto_earn_interest_paid')) {
+            $earn['Crypto.com'] = $cdcTransactions['crypto_earn_interest_paid']
                 ->groupBy('currency')
-                ->map(function ($transactions, $coin) use (&$sum) {
-                    $row = [
-                        'title'         => $coin,
-                        'symbol'        => $coin,
-                        'amount'        => $transactions->sum('amount'),
-                        'native'        => $transactions->sum('native_amount'),
-                        'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
-                    ];
-
-                    $sum['native'] += $row['native'];
-                    $sum['currentNative'] += $row['currentNative'];
-
-                    return $row;
-                });
+                ->map(fn($transactions, $coin) => [
+                    'title'         => $coin,
+                    'symbol'        => $coin,
+                    'amount'        => $transactions->sum('amount'),
+                    'native'        => $transactions->sum('native_amount'),
+                    'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
+                ]);
+        }
+        if ($cdcTransactions->has('crypto_earn_extra_interest_paid')) {
+            $earn['Crypto.com'][] = [
+                'title'         => 'Earn Extra Interest',
+                'symbol'        => 'CRO',
+                'amount'        => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('amount'),
+                'native'        => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('native_amount'),
+                'currentNative' => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('amount') * Coingecko::price('cro'),
+            ];
         }
 
+        $earn['Nexo'] = $this->getEarn(Platform::NEXO, 'Interest');
+        $earn['Binance'] = $this->getEarn(Platform::BINANCE_EARN, 'Interest');
+        $earn['YouHodler'] = $this->getEarn(Platform::YOUHODLER, 'Interest');
+
         return view('livewire.dashboard')
-            ->with('transactions', $transactions)
-            ->with('nexoTransactions', $nexoTransactions)
+            ->with('cdcTransactions', $cdcTransactions)
             ->with('rows', $rows)
-            ->with('sum', $sum)
-            ->with('earnCdc', $earnCdc)
-            ->with('earnNexo', $earnNexo);
+            ->with('earn', $earn->filter(fn($p) => $p->count()));
+    }
+
+    private function getEarn($platform, $kind): Collection
+    {
+        return Auth::user()
+            ->transactions()
+            ->where('platform', $platform)
+            ->where('kind', $kind)
+            ->when($this->from, fn($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
+            ->when($this->to, fn($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
+            ->get()
+            ->groupBy('currency')
+            ->map(fn($transactions, $coin) => [
+                'title'         => $coin,
+                'symbol'        => $coin,
+                'amount'        => $transactions->sum('amount'),
+                'native'        => $transactions->sum('native_amount') ?? 0,
+                'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
+            ]);
     }
 }

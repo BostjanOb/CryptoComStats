@@ -18,8 +18,9 @@
                     <select id="platform" name="platform"
                             wire:model.defer="platform"
                             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option value="cdc">Crypto.com</option>
-                        <option value="nexo">Nexo</option>
+                        @foreach(\App\Platform::PLATFORMS as $key => $name)
+                            <option value="{{ $key }}">{{ $name }}</option>
+                        @endforeach
                     </select>
                 </div>
 
