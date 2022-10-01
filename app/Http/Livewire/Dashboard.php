@@ -48,13 +48,13 @@ class Dashboard extends Component
             'referral_card_cashback' => ['title' => 'Crpyo.com Cashback', 'amount' => 0, 'currency' => 'CRO'],
             'mco_stake_reward'       => ['title' => 'Crypto.com CRO Stake rewards', 'amount' => 0, 'currency' => 'CRO'],
             'reimbursement'          => ['title' => 'Crypto.com Reimbursement (Netflix / Spotify)', 'amount' => 0, 'currency' => 'CRO'],
-        ]);
+        ])->map(function ($val, $key) use ($cdcTransactions) {
+            $val['amount'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('amount') : 0;
+            $val['native'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('native_amount') : 0;
+            $val['currentNative'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('amount') * Coingecko::price('cro') : 0;
 
-        foreach ($rows as $key => &$row) {
-            $row['amount'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('amount') : 0;
-            $row['native'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('native_amount') : 0;
-            $row['currentNative'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('amount') * Coingecko::price('cro') : 0;
-        }
+            return $val;
+        });
 
         $binanceCashback = Auth::user()
             ->transactions()

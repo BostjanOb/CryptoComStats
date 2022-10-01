@@ -87,7 +87,7 @@
                                                     <x-price :price="$row['amount']" :currency="$row['currency']"/>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    @if(isset($rows['native']))
+                                                    @if(isset($row['native']))
                                                         <x-price :price="$row['native']" currency="EUR" :decimals="3"/>
                                                     @endif
                                                 </td>
