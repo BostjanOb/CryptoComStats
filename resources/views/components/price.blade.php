@@ -5,9 +5,10 @@
 ])
 <span class="whitespace-nowrap">
     @if($decimals === null)
-        {{ $price }}
-    @else
-        {{ number_format($price, $decimals) }}
+        @php
+            $decimals = strlen($price) - strpos($price, '.');
+        @endphp
     @endif
-    {{ $currency }}
+
+    {{ number_format($price, $decimals, ',', '.') }} {{ $currency }}
 </span>
