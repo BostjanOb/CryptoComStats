@@ -10,6 +10,11 @@ use Illuminate\Support\Str;
 
 class Coingecko
 {
+    public static $idMap = [
+        'eth' => 'ethereum',
+        'usdt' => 'tether',
+    ];
+
     public static function price($coin, $fiat = 'eur'): ?float
     {
         $coin = Str::lower($coin);
@@ -18,13 +23,13 @@ class Coingecko
             "coingecko_price_{$coin}_{$fiat}",
             now()->addMinutes(10),
             function () use ($coin, $fiat) {
-                $coinId = Arr::get(self::coinsList()->get($coin, []), 'id', null);
+                $coinId = self::$idMap[$coin] ?? Arr::get(self::coinsList()->get($coin, []), 'id', null);
                 if ($coinId === null) {
                     throw new \InvalidArgumentException("Coin $coin not found");
                 }
 
                 $price = Http::get('https://api.coingecko.com/api/v3/simple/price', [
-                    'ids'           => $coinId,
+                    'ids' => $coinId,
                     'vs_currencies' => $fiat,
                 ])->json();
 
@@ -38,9 +43,9 @@ class Coingecko
         return Cache::remember(
             'coins_list',
             now()->addMinutes(60),
-            fn() => Http::get('https://api.coingecko.com/api/v3/coins/list')
+            fn () => Http::get('https://api.coingecko.com/api/v3/coins/list')
                 ->collect()
-                ->reject(fn($coin) => Str::endsWith($coin['id'], '-wormhole'))
+                ->reject(fn ($coin) => Str::endsWith($coin['id'], '-wormhole'))
                 ->keyBy('symbol')
         );
     }

@@ -32,17 +32,17 @@ class BinanceEarnImport implements ToCollection, WithHeadingRow
 
         $collection->each(function ($row) {
             Transaction::create([
-                'user_id'         => $this->user->id,
-                'platform'        => Platform::BINANCE_EARN,
-                'description'     => 'Interest',
-                'currency'        => $row['coin'],
-                'amount'          => $row['amount'],
-                'to_currency'     => null,
-                'to_amount'       => null,
+                'user_id' => $this->user->id,
+                'platform' => Platform::BINANCE_EARN,
+                'description' => 'Interest',
+                'currency' => $row['coin'],
+                'amount' => $row['amount'],
+                'to_currency' => null,
+                'to_amount' => null,
                 'native_currency' => null,
-                'native_amount'   => null,
-                'kind'            => 'Interest',
-                'created_at'      => Carbon::parse($row['dateutc'], 'UTC'),
+                'native_amount' => null,
+                'kind' => 'Interest',
+                'created_at' => Carbon::parse($row['dateutc'], 'UTC'),
             ]);
         });
     }
