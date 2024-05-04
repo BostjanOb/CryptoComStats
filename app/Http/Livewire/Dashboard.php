@@ -12,6 +12,7 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public ?string $from = null;
+
     public ?string $to = null;
 
     protected $queryString = ['from', 'to'];
@@ -39,15 +40,16 @@ class Dashboard extends Component
         $cdcTransactions = Auth::user()
             ->transactions()
             ->where('platform', Platform::CDC)
-            ->when($this->from, fn($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
-            ->when($this->to, fn($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
+            ->when($this->from, fn ($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
+            ->when($this->to, fn ($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
             ->get()
             ->groupBy('kind');
 
         $rows = collect([
-            'referral_card_cashback' => ['title' => 'Crpyo.com Cashback', 'amount' => 0, 'currency' => 'CRO'],
-            'mco_stake_reward'       => ['title' => 'Crypto.com CRO Stake rewards', 'amount' => 0, 'currency' => 'CRO'],
-            'reimbursement'          => ['title' => 'Crypto.com Reimbursement (Netflix / Spotify)', 'amount' => 0, 'currency' => 'CRO'],
+            'referral_card_cashback' => ['title' => 'Crypto.com Cashback', 'amount' => 0, 'currency' => 'CRO'],
+            'mco_stake_reward' => ['title' => 'Crypto.com CRO Stake rewards', 'amount' => 0, 'currency' => 'CRO'],
+            'finance.lockup.dpos_compound_interest.crypto_wallet' => ['title' => 'Cardholder CRO Stake Reward', 'amount' => 0, 'currency' => 'CRO'],
+            'reimbursement' => ['title' => 'Crypto.com Reimbursement (Netflix / Spotify)', 'amount' => 0, 'currency' => 'CRO'],
         ])->map(function ($val, $key) use ($cdcTransactions) {
             $val['amount'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('amount') : 0;
             $val['native'] = $cdcTransactions->has($key) ? $cdcTransactions[$key]->sum('native_amount') : 0;
@@ -59,34 +61,46 @@ class Dashboard extends Component
         $binanceCashback = Auth::user()
             ->transactions()
             ->where('platform', Platform::BINANCE_CARD)
-            ->when($this->from, fn($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
-            ->when($this->to, fn($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
+            ->when($this->from, fn ($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
+            ->when($this->to, fn ($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
             ->sum('amount');
         $rows['binance_cashback'] = [
-            'title'         => 'Binance Cashback',
-            'amount'        => $binanceCashback,
-            'currency'      => 'BNB',
+            'title' => 'Binance Cashback',
+            'amount' => $binanceCashback,
+            'currency' => 'BNB',
             'currentNative' => $binanceCashback * Coingecko::price('bnb'),
         ];
 
-        $earn = collect([]);
-        if ($cdcTransactions->has('crypto_earn_interest_paid')) {
-            $earn['Crypto.com'] = $cdcTransactions['crypto_earn_interest_paid']
-                ->groupBy('currency')
-                ->map(fn($transactions, $coin) => [
-                    'title'         => $coin,
-                    'symbol'        => $coin,
-                    'amount'        => $transactions->sum('amount'),
-                    'native'        => $transactions->sum('native_amount'),
-                    'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
-                ]);
+        $earn = collect([
+            'Crypto.com' => collect([]),
+        ]);
+        foreach (
+            [
+                'crypto_earn_interest_paid',
+                'finance.dpos.compound_interest.crypto_wallet',
+            ] as $key
+        ) {
+            if ($cdcTransactions->has($key)) {
+                $earn['Crypto.com']->push(
+                    ...$cdcTransactions[$key]
+                        ->groupBy('currency')
+                        ->map(fn ($transactions, $coin) => [
+                            'title' => $coin,
+                            'symbol' => $coin,
+                            'amount' => $transactions->sum('amount'),
+                            'native' => $transactions->sum('native_amount'),
+                            'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
+                        ])
+                );
+            }
         }
+
         if ($cdcTransactions->has('crypto_earn_extra_interest_paid')) {
             $earn['Crypto.com'][] = [
-                'title'         => 'Earn Extra Interest',
-                'symbol'        => 'CRO',
-                'amount'        => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('amount'),
-                'native'        => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('native_amount'),
+                'title' => 'Earn Extra Interest',
+                'symbol' => 'CRO',
+                'amount' => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('amount'),
+                'native' => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('native_amount'),
                 'currentNative' => $cdcTransactions['crypto_earn_extra_interest_paid']->sum('amount') * Coingecko::price('cro'),
             ];
         }
@@ -98,7 +112,7 @@ class Dashboard extends Component
         return view('livewire.dashboard')
             ->with('cdcTransactions', $cdcTransactions)
             ->with('rows', $rows)
-            ->with('earn', $earn->filter(fn($p) => $p->count()));
+            ->with('earn', $earn->filter(fn ($p) => $p->count()));
     }
 
     private function getEarn($platform, $kind): Collection
@@ -107,15 +121,15 @@ class Dashboard extends Component
             ->transactions()
             ->where('platform', $platform)
             ->where('kind', $kind)
-            ->when($this->from, fn($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
-            ->when($this->to, fn($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
+            ->when($this->from, fn ($q) => $q->where('created_at', '>=', Carbon::parse($this->from)->startOfDay()))
+            ->when($this->to, fn ($q) => $q->where('created_at', '<=', Carbon::parse($this->to)->endOfDay()))
             ->get()
             ->groupBy('currency')
-            ->map(fn($transactions, $coin) => [
-                'title'         => $coin,
-                'symbol'        => $coin,
-                'amount'        => $transactions->sum('amount'),
-                'native'        => $transactions->sum('native_amount') ?? 0,
+            ->map(fn ($transactions, $coin) => [
+                'title' => $coin,
+                'symbol' => $coin,
+                'amount' => $transactions->sum('amount'),
+                'native' => $transactions->sum('native_amount') ?? 0,
                 'currentNative' => $transactions->sum('amount') * Coingecko::price($coin),
             ]);
     }
