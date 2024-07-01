@@ -15,34 +15,31 @@ class NexoTransactionsImport implements ToCollection, WithHeadingRow
 {
     use Importable;
 
-    private User $user;
-
-    public function __construct(User $user)
+    public function __construct(private User $user)
     {
-        $this->user = $user;
     }
 
     public function collection(Collection $collection)
     {
-        Transaction::where('created_at', '>=', Carbon::parse($collection->min('date_time')))
-            ->where('created_at', '<=', Carbon::parse($collection->max('date_time')))
+        Transaction::where('created_at', '>=', Carbon::parse($collection->min('date_time_utc')))
+            ->where('created_at', '<=', Carbon::parse($collection->max('date_time_utc')))
             ->where('user_id', $this->user->id)
             ->where('platform', Platform::NEXO)
             ->delete();
 
         $collection->each(function ($row) {
             Transaction::create([
-                'user_id'         => $this->user->id,
-                'platform'        => Platform::NEXO,
-                'description'     => $row['type'],
-                'currency'        => $row['output_currency'],
-                'amount'          => $row['output_amount'],
-                'to_currency'     => null,
-                'to_amount'       => null,
+                'user_id' => $this->user->id,
+                'platform' => Platform::NEXO,
+                'description' => $row['type'],
+                'currency' => $row['output_currency'],
+                'amount' => $row['output_amount'],
+                'to_currency' => null,
+                'to_amount' => null,
                 'native_currency' => 'USD',
-                'native_amount'   => (float)substr($row['usd_equivalent'], 1),
-                'kind'            => $row['type'],
-                'created_at'      => Carbon::parse($row['date_time'], 'UTC'),
+                'native_amount' => (float) substr($row['usd_equivalent'], 1),
+                'kind' => $row['type'],
+                'created_at' => Carbon::parse($row['date_time_utc'], 'UTC'),
             ]);
         });
     }

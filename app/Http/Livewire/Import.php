@@ -18,8 +18,11 @@ class Import extends Component
     use WithFileUploads;
 
     public int $readyToImport = 0;
+
     public string $platform = 'cdc';
+
     public $file;
+
     public bool $imported = false;
 
     public function updatedFile()
@@ -50,7 +53,7 @@ class Import extends Component
                 case Platform::CDC:
                     (new CdcTransactionsImport(Auth::user()))->import($this->file->path(), null, Excel::CSV);
                     break;
-                case Platform::NEXO;
+                case Platform::NEXO:
                     (new NexoTransactionsImport(Auth::user()))->import($this->file->path(), null, Excel::CSV);
                     break;
                 case Platform::BINANCE_EARN:
@@ -91,16 +94,16 @@ class Import extends Component
 
         $header = array_keys($data[0][0]);
         if (count(array_diff([
-            "timestamp_utc",
-            "transaction_description",
-            "currency",
-            "amount",
-            "to_currency",
-            "to_amount",
-            "native_currency",
-            "native_amount",
-            "native_amount_in_usd",
-            "transaction_kind",
+            'timestamp_utc',
+            'transaction_description',
+            'currency',
+            'amount',
+            'to_currency',
+            'to_amount',
+            'native_currency',
+            'native_amount',
+            'native_amount_in_usd',
+            'transaction_kind',
         ], $header))) {
             $this->addError('file', 'Invalid file format');
 
@@ -127,12 +130,13 @@ class Import extends Component
         }
 
         $header = array_keys($data[0][0]);
+
         if (count(array_diff([
             'type',
             'output_currency',
             'output_amount',
             'usd_equivalent',
-            'date_time',
+            'date_time_utc',
         ], $header))) {
             $this->addError('file', 'Invalid file format');
 
@@ -147,7 +151,7 @@ class Import extends Component
         try {
             $data = json_decode(file_get_contents($this->file->path()));
 
-            if ($data === null || !property_exists($data, 'data')) {
+            if ($data === null || ! property_exists($data, 'data')) {
                 throw new \Exception('Invalid file');
             }
 
@@ -158,7 +162,7 @@ class Import extends Component
             return;
         }
 
-        $this->readyToImport = $data->reject(fn($t) => is_null($t->cashbackDetail))
+        $this->readyToImport = $data->reject(fn ($t) => is_null($t->cashbackDetail))
             ->count();
     }
 
